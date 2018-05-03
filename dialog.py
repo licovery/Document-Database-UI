@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QTextBrowser, QLabel, QTextEdit, QPushButton, QGridLayout, QDialog
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
-
+from PyQt5.QtGui import QFont
 import json
 
 from docdb.query import Query
@@ -12,12 +12,15 @@ class ReadDialog(QDialog):
 
 
         super().__init__(parent)
-        self.resize(500, 400)
+        self.resize(400, 275)
+
 
         self.gbox = QGridLayout()
         self.label = QLabel('详细内容', self)
 
+
         self.textbrowser = QTextBrowser(self)
+        self.textbrowser.setFont(QFont("consolas", 12))
 
 
         self.textbrowser.setPlainText(json.dumps(doc.element))
@@ -34,11 +37,14 @@ class SearchDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.resize(500, 400)
+        self.resize(400, 275)
+
 
         self.gbox = QGridLayout()
         self.label1 = QLabel('查询条件(字符串使用双引号 例 {"name": "neo"})', self)
         self.textedit =  QTextEdit(self)
+        self.textedit.setFont((QFont("consolas", 12)))
+
         self.label2 = QLabel('空条件', self)
         self.label2.setStyleSheet('color:red')
         self.button = QPushButton('确定查询')
@@ -100,11 +106,14 @@ class InsertDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.resize(400, 275)
 
-        self.resize(500, 400)
+
         self.gbox = QGridLayout()
         self.label1 = QLabel('插入文档(字符串使用双引号 例 {"name": "neo"} )', self)
         self.textedit = QTextEdit(self)
+        self.textedit.setFont((QFont("consolas", 12)))
+
         self.label2 = QLabel('空文档', self)
         self.label2.setStyleSheet('color:red')
         self.button = QPushButton('插入')
@@ -159,12 +168,15 @@ class UpdateDialog(QDialog):
 
         self.doc = doc
 
-        self.resize(500, 400)
+        self.resize(400, 275)
 
         self.gbox = QGridLayout()
         self.label1 = QLabel('更新文档(字符串使用双引号 例 {"name": "neo"} )', self)
         self.textedit = QTextEdit(self)
+        self.textedit.setFont((QFont("consolas", 12)))
         self.textedit.setPlainText(json.dumps(doc.element))
+
+
         self.label2 = QLabel('格式正确', self)
         self.label2.setStyleSheet('color: green')
         self.button = QPushButton('更新')

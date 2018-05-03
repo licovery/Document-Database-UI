@@ -3,7 +3,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from dialog import *
 import json
-
+from PyQt5.QtGui import QFont
 
 class DocListWidget(QListWidget):
 
@@ -20,14 +20,18 @@ class DocListWidget(QListWidget):
         self.update_doc = QAction('修改文档')
         self.remove_doc = QAction('删除文档')
 
+
+
         self.menu.addAction(self.read_doc)
         self.menu.addAction(self.update_doc)
         self.menu.addAction(self.remove_doc)
+
 
         self.currentRowChanged.connect(self.slot_doc_change)
         self.read_doc.triggered.connect(self.slot_read_doc)
         self.update_doc.triggered.connect(self.slot_update_doc)
         self.remove_doc.triggered.connect(self.slot_remove_doc)
+
 
 
     def set_docs(self, docs):
@@ -39,6 +43,7 @@ class DocListWidget(QListWidget):
         self.clear()
         for doc in self.docs:
             self.addItem(QListWidgetItem(json.dumps(doc.element)))
+
         self.setCurrentRow(0)
 
 

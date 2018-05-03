@@ -1,17 +1,20 @@
 from PyQt5.QtWidgets import QWidget, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QInputDialog, QLineEdit
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-
+from PyQt5.QtGui import QFont
 
 from dialog import *
 from doclistwidget import DocListWidget
 from docdb import *
 
+
 class MainWindow(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, path, parent=None):
         super().__init__(parent)
+        self.resize(700, 400)
+        self.setWindowTitle('文档数据库')
 
 
-        self.docdb = DocDb('test')
+        self.docdb = DocDb(path)
         self.current_col = self.docdb.collection('default')
 
 
@@ -20,10 +23,12 @@ class MainWindow(QWidget):
         vbox2 = QVBoxLayout()
 
         self.collections = QListWidget(self)
-
+        self.collections.setStyleSheet("QListWidget::item:selected{background:skyblue; color:black}");
+        self.collections.setFont(QFont("consolas", 12))
         for col_name in self.docdb.getCollections():
             self.collections.addItem(QListWidgetItem(col_name))
-
+            self.collections.sortItems()
+        self.collections.setCurrentRow(0)
 
         self.collections.currentRowChanged.connect(self.slot_collection_change)
         self.collections.itemDoubleClicked.connect(self.slot_collection_doubleclick)
@@ -43,6 +48,8 @@ class MainWindow(QWidget):
 
 
         self.content = DocListWidget(self)
+        self.content.setStyleSheet("QListWidget::item:selected{background:skyblue; color:black}");
+        self.content.setFont(QFont("consolas", 12))
         self.content.set_docs(self.current_col.all())
 
         self.content.signal_update_doc.connect(self.slot_update_doc)
@@ -61,7 +68,7 @@ class MainWindow(QWidget):
         hbox.setStretchFactor(vbox2, 3)
         self.setLayout(hbox)
 
-        print(self.size())
+
 
     #如果同时双击和切换行，会同时出发两个槽函数（优化）
     @pyqtSlot(QListWidgetItem)
@@ -81,17 +88,20 @@ class MainWindow(QWidget):
             print('collection row change')
 
 
+
+    # 处理空串和同名集合
     @pyqtSlot()
     def slot_cre_col(self):
         value, ok = QInputDialog.getText(self, '新建集合', '请输入集合名', QLineEdit.Normal)
         if ok and value:
             if not value in self.docdb.getCollections():
-                self.collections.addItem(QListWidgetItem(value))
+                item = QListWidgetItem(value)
+                self.collections.addItem(item)
+                r = self.collections.row(item)
+                self.collections.setCurrentRow(r)
+                self.current_col = self.docdb.collection(value)
+                self.content.set_docs(self.current_col.all())
 
-            self.current_col = self.docdb.collection(value)
-            self.content.set_docs(self.current_col.all())
-
-            # 处理空串和同名集合
 
 
     #考虑删除集合移动到右键操作而不是单独按钮
@@ -109,7 +119,7 @@ class MainWindow(QWidget):
 
     @pyqtSlot()
     def slot_find_doc(self):
-        if self.collections.currentRow() != 1:
+        if self.collections.currentRow() != -1:
             w = SearchDialog(self)
             if w.exec_():
                 docs = self.current_col.find(w.res)
